@@ -12,15 +12,11 @@ public class HoWoMapper extends Mapper<LongWritable, Text, Text, Text>{
  
 	private final static IntWritable one = new IntWritable(1);
     private Text word = new Text();
-	@Override
+
+    @Override
 	protected void map(LongWritable key, Text value,
 			Context context)
 			throws IOException, InterruptedException {
-		String line = value.toString();
-		StringTokenizer st = new StringTokenizer(line," ");
-		while(st.hasMoreTokens()){
-			word.set(st.nextToken());
-			context.write(word, new Text(one.toString()) );
-		}
+		context.write(new Text("bubu") , new Text("fifi") );
 	}
 }

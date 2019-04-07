@@ -36,11 +36,12 @@ public class HomeWork extends Configured implements Tool{
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 	
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
+		job.setOutputValueClass(Text.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 		job.setMapperClass(HoWoMapper.class);
+        job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
-		job.setReducerClass(HoWoReducer.class);
+//		job.setReducerClass(HoWoReducer.class);
 	
 		int returnValue = job.waitForCompletion(true) ? 0:1;
 		System.out.println("job.isSuccessful " + job.isSuccessful());
