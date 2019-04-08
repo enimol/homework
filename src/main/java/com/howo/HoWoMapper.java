@@ -1,9 +1,12 @@
 package com.howo;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
- 
-import org.apache.hadoop.io.IntWritable;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -12,7 +15,6 @@ import com.github.javafaker.Faker;
  
 public class HoWoMapper extends Mapper<LongWritable, Text, Text, Text>{
  
-	private final static IntWritable one = new IntWritable(1);
     private Integer count = 0;
     public static final String COUNT = "app.config.count";
     Faker faker = new Faker();
@@ -23,13 +25,20 @@ public class HoWoMapper extends Mapper<LongWritable, Text, Text, Text>{
     }
 
     @Override
-	protected void map(LongWritable key, Text value,
-			Context context)
+	protected void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-    	 for(int i=0; i < this.count; i++) {
-				String lastName = faker.name().fullName();
-				String firstName = faker.name().firstName();
-    			context.write(new Text(lastName) , new Text(firstName) );
-    	 }
+    	Date now = new Date();
+    	Date past = null;
+    	StringBuilder sb = new StringBuilder();
+		for(int i=0; i < this.count; i++) {
+			String lastName = faker.name().lastName();
+			sb.append(faker.name().firstName() + ",");
+			sb.append(faker.address().cityName() + ",");
+			past = faker.date().past(1, TimeUnit.SECONDS, now);
+			LocalDate ldate = LocalDate.from(past.toInstant().atZone(ZoneOffset.UTC));
+			sb.append(DateTimeFormatter.ISO_DATE.format(ldate));
+			sb.append("\n");
+			context.write(new Text(lastName) , new Text(sb.toString()) );
+		}
 	}
 }

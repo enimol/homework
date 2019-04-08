@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -35,7 +33,6 @@ public class HomeWork extends Configured implements Tool{
 		Job job = new org.apache.hadoop.mapreduce.Job();
 
 		Configuration configuration = job.getConfiguration();
-		configuration.set("mapred.textoutputformat.separatorText", ",");
 		configuration.set("mapred.textoutputformat.separator", ",");
 		configuration.set("fs.defaultFS","hdfs://sandbox-hdp.hortonworks.com:8020");
 		configuration.set(HoWoMapper.COUNT, args[0]);
