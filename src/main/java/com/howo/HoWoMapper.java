@@ -32,12 +32,12 @@ public class HoWoMapper extends Mapper<LongWritable, Text, Text, Text>{
     	StringBuilder sb = new StringBuilder();
 		for(int i=0; i < this.count; i++) {
 			String lastName = faker.name().lastName();
+			sb.setLength(0);
 			sb.append(faker.name().firstName() + ",");
 			sb.append(faker.address().cityName() + ",");
 			past = faker.date().past(1, TimeUnit.SECONDS, now);
 			LocalDate ldate = LocalDate.from(past.toInstant().atZone(ZoneOffset.UTC));
 			sb.append(DateTimeFormatter.ISO_DATE.format(ldate));
-			sb.append("\n");
 			context.write(new Text(lastName) , new Text(sb.toString()) );
 		}
 	}
