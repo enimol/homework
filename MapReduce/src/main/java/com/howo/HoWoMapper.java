@@ -13,19 +13,34 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+/**
+ *
+ * @author Apa
+ *
+ */
 public class HoWoMapper extends Mapper<LongWritable, Text, Text, Text> {
 
+  /**
+   * count is the count of random lines.
+   */
   private Integer count = 0;
+  /**
+   * COUNT comes from HomeWork.
+   */
   public static final String COUNT = "app.config.count";
-  Faker faker = new Faker();
+  /**
+   * faker provides randomized strings.
+   */
+  private Faker faker = new Faker();
 
   @Override
-  protected void setup(Context context) {
+  protected final void setup(final Context context) {
     this.count = Integer.parseInt(context.getConfiguration().get(COUNT));
   }
 
   @Override
-  protected void map(LongWritable key, Text value, Context context)
+  protected final void map(final LongWritable key,
+      final Text value, final Context context)
       throws IOException, InterruptedException {
     Date now = new Date();
     Date past = null;

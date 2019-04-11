@@ -13,17 +13,30 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+/**
+ *
+ * @author Apa
+ *
+ */
 public class HomeWork extends Configured implements Tool {
 
-  public static void main(String[] args) throws Exception {
+  /**
+   * My homework.
+   * @param args args[0]: count, args[1]: output folder.
+   * @throws Exception Exception
+   */
+  public static void main(final String[] args) throws Exception {
     int exitCode = ToolRunner.run(new HomeWork(), args);
     System.exit(exitCode);
   }
 
   /**
    * Here we go...
+   * @param args args[0]: HomeWork, args[1]: main args.
+   * @throws Exception Exception
+   * @return -1
    */
-  public int run(String[] args) throws Exception {
+  public final int run(final String[] args) throws Exception {
     if (args.length != 2) {
       System.err.printf("Usage: %s [generic options] <count> <output>\n",
           getClass().getSimpleName());
@@ -35,7 +48,8 @@ public class HomeWork extends Configured implements Tool {
 
     Configuration configuration = job.getConfiguration();
     configuration.set("mapred.textoutputformat.separator", ",");
-    configuration.set("fs.defaultFS","hdfs://sandbox-hdp.hortonworks.com:8020");
+    configuration.set("fs.defaultFS",
+        "hdfs://sandbox-hdp.hortonworks.com:8020");
     configuration.set(HoWoMapper.COUNT, args[0]);
 
     FileSystem fs = FileSystem.get(configuration);
@@ -58,7 +72,12 @@ public class HomeWork extends Configured implements Tool {
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(Text.class);
 
-    int returnValue = job.waitForCompletion(true) ? 0 : 1;
+    int returnValue = 0;
+    if (job.waitForCompletion(true)) {
+      returnValue = 0;
+    } else {
+      returnValue = 1;
+    }
     System.out.println("job.isSuccessful " + job.isSuccessful());
     return returnValue;
   }

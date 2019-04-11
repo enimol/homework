@@ -22,14 +22,26 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
 
-public class SparkJob {
+/**
+ *
+ * @author Imre Molnar
+ *
+ */
+public final class SparkJob {
+
+  /**
+   * For the maven check-style compliance.
+   *
+   */
+  private SparkJob() {
+  }
 
   /**
    * This is my job.
    * @param args  args[0]: folder of input file(s), args[1]: table name.
-   * 
+   *
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
 
     SparkConf sparkConf = new SparkConf();
     sparkConf.setAppName("Hello Spark");
@@ -52,7 +64,7 @@ public class SparkJob {
 
     Dataset<Row> df = spark.read()
         .option("mode", "DROPMALFORMED")
-        .option("header","false")
+        .option("header", "false")
         .schema(schema)
         .csv(inputPath);
 
@@ -68,7 +80,8 @@ public class SparkJob {
       Connection connection = ConnectionFactory.createConnection(config);
       // Description of the declaration table
       TableName userTable  = TableName.valueOf(args[1]);
-      TableDescriptorBuilder tableDescr = TableDescriptorBuilder.newBuilder(userTable);
+      TableDescriptorBuilder tableDescr =
+          TableDescriptorBuilder.newBuilder(userTable);
       tableDescr.setColumnFamily(ColumnFamilyDescriptorBuilder.of("info"));
       // Create a Table
       System.out.println("Creating table " + args[1]);
@@ -87,10 +100,18 @@ public class SparkJob {
       byte[] familyName = Bytes.toBytes("info");
       for (Row row : rowslist) {
         Put put = new Put(Bytes.toBytes("row" + rowNumber));
-        put.addColumn(familyName, Bytes.toBytes("FirstName"), Bytes.toBytes(row.getString(0)));
-        put.addColumn(familyName, Bytes.toBytes("LastName"), Bytes.toBytes(row.getString(1)));
-        put.addColumn(familyName, Bytes.toBytes("Location"), Bytes.toBytes(row.getString(2)));
-        put.addColumn(familyName, Bytes.toBytes("Count"), Bytes.toBytes(((Long) df.count()).toString()));
+        put.addColumn(familyName,
+            Bytes.toBytes("FirstName"),
+            Bytes.toBytes(row.getString(0)));
+        put.addColumn(familyName,
+            Bytes.toBytes("LastName"),
+            Bytes.toBytes(row.getString(1)));
+        put.addColumn(familyName,
+            Bytes.toBytes("Location"),
+            Bytes.toBytes(row.getString(2)));
+        put.addColumn(familyName,
+            Bytes.toBytes("Count"),
+            Bytes.toBytes(((Long) df.count()).toString()));
         table.put(put);
         rowNumber++;
         System.out.println("Stored line:" + rowNumber);
