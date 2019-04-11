@@ -27,18 +27,18 @@ public class SparkJob {
 		SparkSession spark = SparkSession
 				.builder()
 				.appName("Java Spark SQL Example")
-				.getOrCreate();	       
+				.getOrCreate();
 
 		StructType schema = new StructType()
-				.add("department", "string")
-				.add("designation", "string")
-				.add("ctc", "long")
-				.add("state", "string");
+				.add("FirstName", "string")
+				.add("LastName", "string")
+				.add("Location", "string")
+				.add("BirthDate", "string");
 
 		Dataset<Row> df = spark.read()
-				.option("mode", "DROPMALFORMED")
+				.option("mode", "DROPMALFORMED").option("header","false")
 				.schema(schema)
-				.csv("hdfs:///tmp/input.csv");
+				.csv(args[0]); //"hdfs:///tmp/output/part-r-00000");
 		//...
 		System.out.println(df.count());
 		Configuration config = null;
@@ -52,7 +52,7 @@ public class SparkJob {
 			System.out.println("HBase is running!");
 			Connection connection = ConnectionFactory.createConnection(config);
 			// Description of the declaration table
-			TableName userTable  = TableName.valueOf("shb1");
+			TableName userTable  = TableName.valueOf(args[1]);
 			TableDescriptorBuilder tableDescr = TableDescriptorBuilder.newBuilder(userTable);
 			tableDescr.setColumnFamily(ColumnFamilyDescriptorBuilder.of("info"));
 			// Create a Table
@@ -69,18 +69,17 @@ public class SparkJob {
 			Long rowNumber = 0L;
 			byte[] familyName = Bytes.toBytes("info");
 			for (Row row : rowslist) {
-				rowNumber++;
-				String[] columns = row.toString().split(",");
 				Put put = new Put(Bytes.toBytes("row" + rowNumber));
-		        put.addColumn(familyName, Bytes.toBytes("FirstName"), Bytes.toBytes(columns[0]));
-		        put.addColumn(familyName, Bytes.toBytes("LastName"), Bytes.toBytes(columns[1]));
-		        put.addColumn(familyName, Bytes.toBytes("Location"), Bytes.toBytes(columns[2]));
-		        put.addColumn(familyName, Bytes.toBytes("Count"), Bytes.toBytes(columns[3]));
-		        table.put(put);
+				put.addColumn(familyName, Bytes.toBytes("FirstName"), Bytes.toBytes(row.getString(0)));
+				put.addColumn(familyName, Bytes.toBytes("LastName"), Bytes.toBytes(row.getString(1)));
+				put.addColumn(familyName, Bytes.toBytes("Location"), Bytes.toBytes(row.getString(2)));
+				put.addColumn(familyName, Bytes.toBytes("Count"), Bytes.toBytes(((Long) df.count()).toString()));
+				table.put(put);
+				rowNumber++;
 			}
-			
+
 			connection.close();
-		}catch (Exception ce){ 
+		}catch (Exception ce){
 			ce.printStackTrace();
 		}
 		context.close();
